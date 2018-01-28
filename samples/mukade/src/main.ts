@@ -64,48 +64,35 @@ class MyBodyRenderer extends PIXI.Container {
         const kelps = [];
         this.canvas.lineStyle();
         this.body.legs.forEach((leg: Legs.NormalLeg, id) => {
-            const tr = (1 - (Math.cos(leg.moveProgress * Math.PI * 2) + 1) / 2) * 0.6 + 1;
+            const color = new Color(0xCCCCCC);
+            Color.transformRGB(color, new Color(0x999999), ((Math.cos(leg.moveProgress * Math.PI * 2) + 1) / 2));
             Drawer.line.drawMuscleLine(
                 this.canvas,
                 [
                     {
                         pos: leg.rootPos,
-                        radius: 24,
-                        ratio: 1
+                        radius: 10
                     },
                     {
                         pos: leg.middlePos,
-                        radius: 10 * tr,
-                        ratio: 1
+                        radius: 5
                     },
                     {
                         pos: leg.endPos,
-                        radius: 4 * tr * 0.6,
-                        ratio: 1
+                        radius: 1
                     }
                 ],
                 [cb(0.455, 0.03, 0.515, 0.955, 50), cb(0.215, 0.61, 0.355, 1, 50)],
-                0xCCCCCC + (0x111111 * Math.floor(id / 2)),
+                color.getColor(),
                 5
             );
-            ///*
-            const a = (1 - leg.moveProgress) * 0.6 + 0.4;
-            const color = new Color(0xff0000);
-            Color.transformRGB(color, new Color(0x0000ff), leg.moveProgress);
-            this.canvas.lineStyle(1, color.getColor());
-            this.canvas.moveTo(leg.beginMovePos.x, leg.beginMovePos.y);
-            this.canvas.lineTo(leg.endMovePos.x, leg.endMovePos.y);
-            this.canvas.lineStyle(1, color.getColor());
-            this.canvas.drawRect(leg.endMovePos.x - 5, leg.endMovePos.y - 5, 10, 10);
-            this.canvas.lineStyle();
-            //*/
         });
         this.body.bone.forEach((p, id) => {
             if (id % 2 > 0) return;
             const r = (this.body.bone.length - id) / this.body.bone.length;
             kelps.push({
                 pos: p,
-                radius: r * 30 * (id % 4 == 0 ? 0.5 : 1),
+                radius: Math.sin(Math.PI * r) * 10 + 3,
                 ratio: 1
             })
         });
@@ -124,28 +111,21 @@ class MyBodyRenderer extends PIXI.Container {
 class MyBody extends Legs.Body {
     public legs: Legs.NormalLeg[] = [];
     constructor() {
-        super(18, 30);
-        const offset = 0;
-        const d = 15;
-        this.legs.push(new Legs.NormalLeg(this, 120, offset,      offset + 8,  "front", Legs.Leg.Position.LEFT,  10, 50, 0 + d * 2,  60, 50));
-        this.legs.push(new Legs.NormalLeg(this, 120, offset,      offset + 8,  "front", Legs.Leg.Position.RIGHT, 10, 50, 60 + d * 2, 60, 50));
-        this.legs.push(new Legs.NormalLeg(this, 120, offset + 12, offset + 12, "back",  Legs.Leg.Position.LEFT,  20, 70, 60 + d * 1, 70, 80));
-        this.legs.push(new Legs.NormalLeg(this, 120, offset + 12, offset + 12, "back",  Legs.Leg.Position.RIGHT, 20, 70, 0 + d * 1,  70, 80));
-        this.legs.push(new Legs.NormalLeg(this, 120, offset + 17, offset + 17, "back",  Legs.Leg.Position.LEFT,  10, 60, 0,          80, 90));
-        this.legs.push(new Legs.NormalLeg(this, 120, offset + 17, offset + 17, "back",  Legs.Leg.Position.RIGHT, 10, 60, 60,         80, 90));
+        super(5, 100);
+        const step = 60;
+        const d = 10;
+        for (let i = 14; i >= 0; i --) {
+            const offset = i * 5;
+            this.legs.push(new Legs.NormalLeg(this, step, offset, offset + 13, "front", Legs.Leg.Position.LEFT, 5, 40, 0 + i * d, 36, 26));
+            this.legs.push(new Legs.NormalLeg(this, step, offset, offset + 13, "front", Legs.Leg.Position.RIGHT, 5, 40, step / 2 + i * d, 36, 26));
+        }
     }
     public setOffset(o: number) {
-        this.legs[0].stepOffset = 0 + o * 2;
-        this.legs[1].stepOffset = 60 + o * 2;
-        this.legs[2].stepOffset = 60 + o * 1;
-        this.legs[3].stepOffset = 0 + o * 1;
-        this.legs[4].stepOffset = 0;
-        this.legs[5].stepOffset = 60;
+        //this.legs[0].stepOffset = 0 + o * 2;
+        //this.legs[1].stepOffset = 60 + o * 2;
     }
     public move(moved) {
-        const l2l = [50, 50, 80, 80, 90, 90];
         this.legs.forEach((l, id) => {
-            l.l2l = l2l[id] * ((Math.cos(l.moveProgress * Math.PI * 2) + 1) / 2 * 0.2 + 0.8);
             l.moveDistance = moved;
         });
     }

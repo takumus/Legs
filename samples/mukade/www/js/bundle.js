@@ -208,35 +208,22 @@
 	        var kelps = [];
 	        this.canvas.lineStyle();
 	        this.body.legs.forEach(function (leg, id) {
-	            var tr = (1 - (Math.cos(leg.moveProgress * Math.PI * 2) + 1) / 2) * 0.6 + 1;
+	            var color = new color_1.default(0xCCCCCC);
+	            color_1.default.transformRGB(color, new color_1.default(0x999999), ((Math.cos(leg.moveProgress * Math.PI * 2) + 1) / 2));
 	            Drawer.line.drawMuscleLine(_this.canvas, [
 	                {
 	                    pos: leg.rootPos,
-	                    radius: 24,
-	                    ratio: 1
+	                    radius: 10
 	                },
 	                {
 	                    pos: leg.middlePos,
-	                    radius: 10 * tr,
-	                    ratio: 1
+	                    radius: 5
 	                },
 	                {
 	                    pos: leg.endPos,
-	                    radius: 4 * tr * 0.6,
-	                    ratio: 1
+	                    radius: 1
 	                }
-	            ], [cubic_bezier_1.default(0.455, 0.03, 0.515, 0.955, 50), cubic_bezier_1.default(0.215, 0.61, 0.355, 1, 50)], 0xCCCCCC + (0x111111 * Math.floor(id / 2)), 5);
-	            ///*
-	            var a = (1 - leg.moveProgress) * 0.6 + 0.4;
-	            var color = new color_1.default(0xff0000);
-	            color_1.default.transformRGB(color, new color_1.default(0x0000ff), leg.moveProgress);
-	            _this.canvas.lineStyle(1, color.getColor());
-	            _this.canvas.moveTo(leg.beginMovePos.x, leg.beginMovePos.y);
-	            _this.canvas.lineTo(leg.endMovePos.x, leg.endMovePos.y);
-	            _this.canvas.lineStyle(1, color.getColor());
-	            _this.canvas.drawRect(leg.endMovePos.x - 5, leg.endMovePos.y - 5, 10, 10);
-	            _this.canvas.lineStyle();
-	            //*/
+	            ], [cubic_bezier_1.default(0.455, 0.03, 0.515, 0.955, 50), cubic_bezier_1.default(0.215, 0.61, 0.355, 1, 50)], color.getColor(), 5);
 	        });
 	        this.body.bone.forEach(function (p, id) {
 	            if (id % 2 > 0)
@@ -244,7 +231,7 @@
 	            var r = (_this.body.bone.length - id) / _this.body.bone.length;
 	            kelps.push({
 	                pos: p,
-	                radius: r * 30 * (id % 4 == 0 ? 0.5 : 1),
+	                radius: Math.sin(Math.PI * r) * 10 + 3,
 	                ratio: 1
 	            });
 	        });
@@ -258,30 +245,23 @@
 	var MyBody = /** @class */ (function (_super) {
 	    __extends(MyBody, _super);
 	    function MyBody() {
-	        var _this = _super.call(this, 18, 30) || this;
+	        var _this = _super.call(this, 5, 100) || this;
 	        _this.legs = [];
-	        var offset = 0;
-	        var d = 15;
-	        _this.legs.push(new Legs.NormalLeg(_this, 120, offset, offset + 8, "front", Legs.Leg.Position.LEFT, 10, 50, 0 + d * 2, 60, 50));
-	        _this.legs.push(new Legs.NormalLeg(_this, 120, offset, offset + 8, "front", Legs.Leg.Position.RIGHT, 10, 50, 60 + d * 2, 60, 50));
-	        _this.legs.push(new Legs.NormalLeg(_this, 120, offset + 12, offset + 12, "back", Legs.Leg.Position.LEFT, 20, 70, 60 + d * 1, 70, 80));
-	        _this.legs.push(new Legs.NormalLeg(_this, 120, offset + 12, offset + 12, "back", Legs.Leg.Position.RIGHT, 20, 70, 0 + d * 1, 70, 80));
-	        _this.legs.push(new Legs.NormalLeg(_this, 120, offset + 17, offset + 17, "back", Legs.Leg.Position.LEFT, 10, 60, 0, 80, 90));
-	        _this.legs.push(new Legs.NormalLeg(_this, 120, offset + 17, offset + 17, "back", Legs.Leg.Position.RIGHT, 10, 60, 60, 80, 90));
+	        var step = 60;
+	        var d = 10;
+	        for (var i = 14; i >= 0; i--) {
+	            var offset = i * 5;
+	            _this.legs.push(new Legs.NormalLeg(_this, step, offset, offset + 13, "front", Legs.Leg.Position.LEFT, 5, 40, 0 + i * d, 36, 26));
+	            _this.legs.push(new Legs.NormalLeg(_this, step, offset, offset + 13, "front", Legs.Leg.Position.RIGHT, 5, 40, step / 2 + i * d, 36, 26));
+	        }
 	        return _this;
 	    }
 	    MyBody.prototype.setOffset = function (o) {
-	        this.legs[0].stepOffset = 0 + o * 2;
-	        this.legs[1].stepOffset = 60 + o * 2;
-	        this.legs[2].stepOffset = 60 + o * 1;
-	        this.legs[3].stepOffset = 0 + o * 1;
-	        this.legs[4].stepOffset = 0;
-	        this.legs[5].stepOffset = 60;
+	        //this.legs[0].stepOffset = 0 + o * 2;
+	        //this.legs[1].stepOffset = 60 + o * 2;
 	    };
 	    MyBody.prototype.move = function (moved) {
-	        var l2l = [50, 50, 80, 80, 90, 90];
 	        this.legs.forEach(function (l, id) {
-	            l.l2l = l2l[id] * ((Math.cos(l.moveProgress * Math.PI * 2) + 1) / 2 * 0.2 + 0.8);
 	            l.moveDistance = moved;
 	        });
 	    };
