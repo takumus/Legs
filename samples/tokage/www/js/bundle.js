@@ -178,7 +178,7 @@
 	        var r = v / 500;
 	        r = r > 1 ? 1 : r;
 	        r = 1 - r;
-	        var o = Math.floor(r * 30);
+	        var o = Math.floor(30);
 	        //if (this.autoGUI.getValue()) {
 	        //    this.offsetGUI.setValue(o);
 	        //}else {
@@ -211,7 +211,7 @@
 	            Drawer.line.drawMuscleLine(_this.canvas, [
 	                {
 	                    pos: leg.rootPos,
-	                    radius: 25,
+	                    radius: 24,
 	                    ratio: 1
 	                },
 	                {
@@ -224,7 +224,7 @@
 	                    radius: 4 * tr * 0.6,
 	                    ratio: 1
 	                }
-	            ], [cubic_bezier_1.default(0.455, 0.03, 0.515, 0.955, 50), cubic_bezier_1.default(0.215, 0.61, 0.355, 1, 50)], 0x999999 + (0x111111 * Math.floor(id / 2)), 5);
+	            ], [cubic_bezier_1.default(0.455, 0.03, 0.515, 0.955, 50), cubic_bezier_1.default(0.215, 0.61, 0.355, 1, 50)], 0xCCCCCC + (0x111111 * Math.floor(id / 2)), 5);
 	            ///*
 	            var a = (1 - leg.moveProgress) * 0.6 + 0.4;
 	            _this.canvas.lineStyle(1, 0x0000ff, a);
@@ -245,7 +245,7 @@
 	                ratio: 1
 	            });
 	        });
-	        Drawer.line.drawMuscleLine(this.canvas, kelps, Drawer.line.styles.sin, 0x666666, 5);
+	        Drawer.line.drawMuscleLine(this.canvas, kelps, Drawer.line.styles.sin, 0xffffff, 5);
 	    };
 	    MyBodyRenderer.prototype.setOffset = function (o) {
 	        this.body.setOffset(o);
@@ -255,7 +255,7 @@
 	var MyBody = /** @class */ (function (_super) {
 	    __extends(MyBody, _super);
 	    function MyBody() {
-	        var _this = _super.call(this, 18, 60) || this;
+	        var _this = _super.call(this, 18, 30) || this;
 	        _this.legs = [];
 	        var offset = 0;
 	        var d = 15;

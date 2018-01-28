@@ -38,7 +38,7 @@ export default class Main extends Canvas {
         let r = v / 500;
         r = r > 1 ? 1 : r;
         r = 1 - r;
-        let o = Math.floor(r * 30);
+        let o = Math.floor(30);
         //if (this.autoGUI.getValue()) {
         //    this.offsetGUI.setValue(o);
         //}else {
@@ -70,7 +70,7 @@ class MyBodyRenderer extends PIXI.Container {
                 [
                     {
                         pos: leg.rootPos,
-                        radius: 25,
+                        radius: 24,
                         ratio: 1
                     },
                     {
@@ -85,7 +85,7 @@ class MyBodyRenderer extends PIXI.Container {
                     }
                 ],
                 [cb(0.455, 0.03, 0.515, 0.955, 50), cb(0.215, 0.61, 0.355, 1, 50)],
-                0x999999 + (0x111111 * Math.floor(id / 2)),
+                0xCCCCCC + (0x111111 * Math.floor(id / 2)),
                 5
             );
             ///*
@@ -111,7 +111,7 @@ class MyBodyRenderer extends PIXI.Container {
             this.canvas,
             kelps,
             Drawer.line.styles.sin,
-            0x666666,
+            0xffffff,
             5
         );
     }
@@ -122,7 +122,7 @@ class MyBodyRenderer extends PIXI.Container {
 class MyBody extends Legs.Body {
     public legs: Legs.NormalLeg[] = [];
     constructor() {
-        super(18, 60);
+        super(18, 30);
         const offset = 0;
         const d = 15;
         this.legs.push(new Legs.NormalLeg(this, 120, offset,      offset + 8,  "front", Legs.Leg.Position.LEFT,  10, 50, 0 + d * 2,  60, 50));
