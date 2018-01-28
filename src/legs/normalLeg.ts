@@ -2,8 +2,8 @@ import {Leg, Body, MoveStyles} from '../';
 import {XY} from 'pos';
 export class NormalLeg extends Leg {
     private directionFB: number;
-    private l1l: number;
-    private l2l: number;
+    public l1l: number;
+    public l2l: number;
     public rootPos: XY;
     public middlePos: XY;
     public endPos: XY;
