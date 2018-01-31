@@ -149,6 +149,7 @@
 	        var _this = _super !== null && _super.apply(this, arguments) || this;
 	        _this.currentSpeed = 0;
 	        _this.targetSpeed = 0;
+	        _this.ate = true;
 	        return _this;
 	    }
 	    Main.prototype.init = function () {
@@ -162,6 +163,7 @@
 	    Main.prototype.mousedown = function () {
 	        this.foodIsReady = false;
 	        this.food = new pos_1.XYR(this.mouse.x, this.mouse.y, 0);
+	        this.ate = false;
 	    };
 	    Main.prototype.mouseup = function () {
 	        this.foodIsReady = true;
@@ -175,15 +177,17 @@
 	        if (this.size.width < 1)
 	            return;
 	        this.canvas.clear();
-	        if (this.food && !this.foodIsReady)
+	        if (this.food && !this.foodIsReady) {
 	            this.food.r = Math.atan2(this.mouse.y - this.food.y, this.mouse.x - this.food.x);
+	            this.ate = false;
+	        }
 	        this.bug.setOffset(40);
 	        if (!this.currentRoute)
 	            this.currentRoute = this.getRoute(new pos_1.XYR(0, 0, 0));
 	        this.p += (this.currentSpeed) / this.currentRoute.length;
 	        if (this.p > 1) {
 	            this.fooding = false;
-	            this.food = null;
+	            this.ate = true;
 	            this.p = this.p % 1;
 	            var begin = this.currentRoute.getTailVecPos();
 	            begin.r -= Math.PI;
@@ -197,7 +201,7 @@
 	        if (this.fooding)
 	            this.renderLine(this.currentRoute, 0x333333);
 	        this.bug.setHead(pos);
-	        if (this.fooding || this.food)
+	        if (!this.ate)
 	            this.renderFood();
 	    };
 	    Main.prototype.getRoute = function (from, next, br, er) {

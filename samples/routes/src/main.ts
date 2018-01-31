@@ -15,6 +15,7 @@ export default class Main extends Canvas {
     private fooding: boolean;
     private currentSpeed: number = 0;
     private targetSpeed: number = 0;
+    private ate: boolean = true;
     public init() {
         this.p = 0;
         this.head = new XYR();
@@ -26,6 +27,7 @@ export default class Main extends Canvas {
     public mousedown() {
         this.foodIsReady = false;
         this.food = new XYR(this.mouse.x, this.mouse.y, 0);
+        this.ate = false;
     }
     public mouseup() {
         this.foodIsReady = true;
@@ -38,13 +40,16 @@ export default class Main extends Canvas {
         this.currentSpeed += (this.targetSpeed - this.currentSpeed) * 0.05;
         if (this.size.width < 1) return;
         this.canvas.clear();
-        if (this.food && !this.foodIsReady) this.food.r = Math.atan2(this.mouse.y - this.food.y, this.mouse.x - this.food.x);
+        if (this.food && !this.foodIsReady) {
+            this.food.r = Math.atan2(this.mouse.y - this.food.y, this.mouse.x - this.food.x);
+            this.ate = false;
+        }
         this.bug.setOffset(40);
         if (!this.currentRoute) this.currentRoute = this.getRoute(new XYR(0, 0, 0));
         this.p += (this.currentSpeed) / this.currentRoute.length;
         if (this.p > 1) {
             this.fooding = false;
-            this.food = null;
+            this.ate = true;
             this.p = this.p % 1;
             const begin = this.currentRoute.getTailVecPos();
             begin.r -= Math.PI;
@@ -57,7 +62,7 @@ export default class Main extends Canvas {
         pos.copyTo(this.ppos);
         if (this.fooding) this.renderLine(this.currentRoute, 0x333333);
         this.bug.setHead(pos);
-        if (this.fooding || this.food) this.renderFood();
+        if (!this.ate) this.renderFood();
     }
     private getRoute(from: XYR, next?: XYR, br: number = 120, er:number = 120) {
         if (!next) next = new XYR(
