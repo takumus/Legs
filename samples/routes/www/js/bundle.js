@@ -157,6 +157,7 @@
 	        this.head = new pos_1.XYR();
 	        this.ppos = new pos_1.XY();
 	        this.bug = new bugs_1.default();
+	        this.food = new pos_1.XYR();
 	        this.bug.scale.set(0.6, 0.6);
 	        this.addChild(this.bug);
 	    };
@@ -177,7 +178,7 @@
 	        if (this.size.width < 1)
 	            return;
 	        this.canvas.clear();
-	        if (this.food && !this.foodIsReady) {
+	        if (!this.foodIsReady) {
 	            this.food.r = Math.atan2(this.mouse.y - this.food.y, this.mouse.x - this.food.x);
 	            this.ate = false;
 	        }

@@ -21,6 +21,7 @@ export default class Main extends Canvas {
         this.head = new XYR();
         this.ppos = new XY();
         this.bug = new Bug();
+        this.food = new XYR();
         this.bug.scale.set(0.6, 0.6);
         this.addChild(this.bug);
     }
@@ -40,7 +41,7 @@ export default class Main extends Canvas {
         this.currentSpeed += (this.targetSpeed - this.currentSpeed) * 0.05;
         if (this.size.width < 1) return;
         this.canvas.clear();
-        if (this.food && !this.foodIsReady) {
+        if (!this.foodIsReady) {
             this.food.r = Math.atan2(this.mouse.y - this.food.y, this.mouse.x - this.food.x);
             this.ate = false;
         }
