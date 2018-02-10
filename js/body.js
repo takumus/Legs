@@ -22,13 +22,6 @@ var Body = /** @class */ (function () {
         enumerable: true,
         configurable: true
     });
-    Object.defineProperty(Body.prototype, "bone", {
-        get: function () {
-            return this._bone;
-        },
-        enumerable: true,
-        configurable: true
-    });
     Body.prototype.setHead = function (pos) {
         var _this = this;
         var np = posStack_1.default.fromPos(pos);
@@ -42,7 +35,7 @@ var Body = /** @class */ (function () {
         else {
             this._posStack = np;
         }
-        this._bone = [];
+        this.bone = [];
         var pp = this._posStack;
         var tp = this._posStack;
         var body = [];
@@ -58,7 +51,7 @@ var Body = /** @class */ (function () {
                 ad += d;
                 if (ad > _this._boneLength) {
                     tp = new posStack_1.default(tp.x + dx / d * nd, tp.y + dy / d * nd);
-                    _this._bone.push(tp.clone());
+                    _this.bone.push(tp.clone());
                     body.push(tp.clone());
                     nd = _this._boneLength;
                     return false;

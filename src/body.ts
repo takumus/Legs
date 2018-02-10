@@ -2,7 +2,7 @@ import {XY} from 'pos';
 import PosStack from './posStack';
 export class Body {
     private _boneLength: number;
-    private _bone: XY[];
+    public bone: XY[];
     private _posStack: PosStack;
     private _jointCount = 60;
     private _moved: number = 0;
@@ -16,9 +16,6 @@ export class Body {
     public get boneLength() {
         return this._boneLength;
     }
-    public get bone() {
-        return this._bone;
-    }
     public setHead(pos: XY) {
         const np = PosStack.fromPos(pos);
         if (this._posStack) {
@@ -30,7 +27,7 @@ export class Body {
         }else {
             this._posStack = np;
         }
-        this._bone = [];
+        this.bone = [];
         let pp: PosStack = this._posStack;
         let tp: XY = this._posStack;
         const body: XY[] = [];
@@ -48,7 +45,7 @@ export class Body {
                         tp.x + dx / d * nd,
                         tp.y + dy / d * nd
                     );
-                    this._bone.push(tp.clone());
+                    this.bone.push(tp.clone());
                     body.push(tp.clone());
                     nd = this._boneLength;
                     return false;
