@@ -334,16 +334,18 @@
 	                    var dx = pp_1.x - np_1.x;
 	                    var dy = pp_1.y - np_1.y;
 	                    var d = pp_1.distance(np_1);
-	                    var r = Math.sin(id * 0.2 + -_this.cr) * 30;
+	                    var r = Math.sin(id * 0.3 + -_this.cr) * 40;
 	                    var vy = dx / d * r;
 	                    var vx = -dy / d * r;
 	                    pp_1.x += vx * (id / _this.jointCount);
 	                    pp_1.y += vy * (id / _this.jointCount);
 	                }
 	            }
+	            p.x += Math.cos(_this.cr) * 6;
+	            p.y += Math.sin(_this.cr) * 6;
 	            return true;
 	        });
-	        this.cr += 0.1;
+	        this.cr += 0.2;
 	        this.move(this.moved);
 	    };
 	    return MyBody;

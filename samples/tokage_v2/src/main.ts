@@ -194,16 +194,18 @@ class MyBody extends Legs.Body {
                     const dx = pp.x - np.x;
                     const dy = pp.y - np.y;
                     const d = pp.distance(np);
-                    const r = Math.sin(id * 0.2 + -this.cr) * 30;
+                    const r = Math.sin(id * 0.3 + -this.cr) * 40;
                     const vy = dx / d * r;
                     const vx = -dy / d * r;
                     pp.x += vx * (id / this.jointCount);
                     pp.y += vy * (id / this.jointCount);
                 }
             }
+            p.x += Math.cos(this.cr) * 6;
+            p.y += Math.sin(this.cr) * 6;
             return true;
         });
-        this.cr += 0.1;
+        this.cr += 0.2;
         this.move(this.moved);
     }
     private cr: number = 0;
