@@ -31,8 +31,8 @@ export default class Main extends Canvas {
         }
         const vx = mx - this.pp.x;
         const vy = my - this.pp.y
-        this.pp.x += vx * 0.04;
-        this.pp.y += vy * 0.04;
+        this.pp.x += vx * 0.1;
+        this.pp.y += vy * 0.1;
 
         const v = Math.sqrt(vx * vx + vy * vy);
         let r = v / 500;
@@ -70,12 +70,12 @@ class MyBodyRenderer extends PIXI.Container {
                 [
                     {
                         pos: leg.rootPos,
-                        radius: 24,
+                        radius: 34,
                         ratio: 1
                     },
                     {
                         pos: leg.middlePos,
-                        radius: 10 * tr,
+                        radius: 16 * tr,
                         ratio: 1
                     },
                     {
@@ -105,9 +105,9 @@ class MyBodyRenderer extends PIXI.Container {
             const r = (this.body.bone.length - id) / this.body.bone.length;
             kelps.push({
                 pos: p,
-                radius: r * 30 * (id % 4 == 0 ? 0.5 : 1),
+                radius: r * 40 * (id % 4 == 0 ? 0.8 : 1),
                 ratio: 1
-            })
+            });
         });
         Drawer.line.drawMuscleLine(
             this.canvas,
@@ -123,30 +123,108 @@ class MyBodyRenderer extends PIXI.Container {
 }
 class MyBody extends Legs.Body {
     public legs: Legs.NormalLeg[] = [];
+    private posStack: PosStack;
+    private moved: number = 0;
     constructor() {
-        super(18, 30);
+        super(18, 38);
         const offset = 0;
         const d = 15;
-        this.legs.push(new Legs.NormalLeg(this, 120, offset,      offset + 8,  "front", Legs.Leg.Position.LEFT,  10, 50, 0 + d * 2,  60, 50));
-        this.legs.push(new Legs.NormalLeg(this, 120, offset,      offset + 8,  "front", Legs.Leg.Position.RIGHT, 10, 50, 60 + d * 2, 60, 50));
-        this.legs.push(new Legs.NormalLeg(this, 120, offset + 12, offset + 12, "back",  Legs.Leg.Position.LEFT,  20, 70, 60 + d * 1, 70, 80));
-        this.legs.push(new Legs.NormalLeg(this, 120, offset + 12, offset + 12, "back",  Legs.Leg.Position.RIGHT, 20, 70, 0 + d * 1,  70, 80));
-        this.legs.push(new Legs.NormalLeg(this, 120, offset + 17, offset + 17, "back",  Legs.Leg.Position.LEFT,  10, 60, 0,          80, 90));
-        this.legs.push(new Legs.NormalLeg(this, 120, offset + 17, offset + 17, "back",  Legs.Leg.Position.RIGHT, 10, 60, 60,         80, 90));
+        const stepDistance = 140;
+        this.legs.push(new Legs.NormalLeg(this, stepDistance, offset,      offset + 10,  "front", Legs.Leg.Position.LEFT,  10, 60, 0 + d * 2,  80, 80));
+        this.legs.push(new Legs.NormalLeg(this, stepDistance, offset,      offset + 10,  "front", Legs.Leg.Position.RIGHT, 10, 60, stepDistance / 2 + d * 2, 80, 80));
+        this.legs.push(new Legs.NormalLeg(this, stepDistance, offset + 19, offset + 19, "back",  Legs.Leg.Position.LEFT,  10, 60, 0,          100, 110));
+        this.legs.push(new Legs.NormalLeg(this, stepDistance, offset + 19, offset + 19, "back",  Legs.Leg.Position.RIGHT, 10, 60, stepDistance / 2,         100, 110));
     }
     public setOffset(o: number) {
-        this.legs[0].stepOffset = 0 + o * 2;
-        this.legs[1].stepOffset = 60 + o * 2;
-        this.legs[2].stepOffset = 60 + o * 1;
-        this.legs[3].stepOffset = 0 + o * 1;
-        this.legs[4].stepOffset = 0;
-        this.legs[5].stepOffset = 60;
     }
     public move(moved) {
-        const l2l = [50, 50, 80, 80, 90, 90];
         this.legs.forEach((l, id) => {
-            l.l2l = l2l[id] * ((Math.cos(l.moveProgress * Math.PI * 2) + 1) / 2 * 0.2 + 0.8);
             l.moveDistance = moved;
         });
+    }
+    public setHead(pos: XY) {
+        const np = PosStack.fromPos(pos);
+        if (this.posStack) {
+            if (np.distance(this.posStack) > 0) {
+                this.moved += np.distance(this.posStack);
+                np.next = this.posStack;
+                this.posStack = np;
+            }
+        }else {
+            this.posStack = np;
+        }
+        this.bone = [];
+        let pp: PosStack = this.posStack;
+        let tp: XY = this.posStack;
+        const body: XY[] = [];
+        for (let i = 0; i < this.jointCount; i ++) {
+            let ad = 0;
+            let nd = this.boneLength;
+            pp.forEach((p, id) => {
+                if (id == 0) return true;
+                const dx = p.x - tp.x;
+                const dy = p.y - tp.y;
+                const d = Math.sqrt(dx * dx + dy * dy);
+                ad += d;
+                if (ad > this.boneLength) {
+                    tp = new PosStack(
+                        tp.x + dx / d * nd,
+                        tp.y + dy / d * nd
+                    );
+                    this.bone.push(tp.clone());
+                    body.push(tp.clone());
+                    nd = this.boneLength;
+                    return false;
+                }else {
+                    pp = tp = p;
+                    nd = this.boneLength - ad;
+                }
+                return true;
+            });
+        }
+        if (pp.next && pp.next.next) {
+            pp.next.next = null;
+        }
+        
+        this.bone.forEach((p, id) => {
+            if (id > 0) {
+                const pp = this.bone[id - 1];
+                const np = p;
+                if (np && pp) {
+                    const dx = pp.x - np.x;
+                    const dy = pp.y - np.y;
+                    const d = pp.distance(np);
+                    const r = Math.sin(id * 0.2 + -this.cr) * 30;
+                    const vy = dx / d * r;
+                    const vx = -dy / d * r;
+                    pp.x += vx * (id / this.jointCount);
+                    pp.y += vy * (id / this.jointCount);
+                }
+            }
+            return true;
+        });
+        this.cr += 0.1;
+        this.move(this.moved);
+    }
+    private cr: number = 0;
+}
+class PosStack extends XY {
+    public next: PosStack;
+    public bx: number;
+    public by: number;
+    public forEach(callback: (v: PosStack, id: number) => boolean): void {
+        let p: PosStack = this;
+        let id = 0;
+        while(p) {
+            if (!callback(p, id)) break;
+            p = p.next;
+            id ++;
+        }
+    }
+    public static fromPos(pos: XY) {
+        const ps = new PosStack(pos.x, pos.y);
+        ps.bx = ps.x;
+        ps.by = ps.y;
+        return ps;
     }
 }

@@ -173,8 +173,8 @@
 	        }
 	        var vx = mx - this.pp.x;
 	        var vy = my - this.pp.y;
-	        this.pp.x += vx * 0.04;
-	        this.pp.y += vy * 0.04;
+	        this.pp.x += vx * 0.1;
+	        this.pp.y += vy * 0.1;
 	        var v = Math.sqrt(vx * vx + vy * vy);
 	        var r = v / 500;
 	        r = r > 1 ? 1 : r;
@@ -212,12 +212,12 @@
 	            Drawer.line.drawMuscleLine(_this.canvas, [
 	                {
 	                    pos: leg.rootPos,
-	                    radius: 24,
+	                    radius: 34,
 	                    ratio: 1
 	                },
 	                {
 	                    pos: leg.middlePos,
-	                    radius: 10 * tr,
+	                    radius: 16 * tr,
 	                    ratio: 1
 	                },
 	                {
@@ -244,7 +244,7 @@
 	            var r = (_this.body.bone.length - id) / _this.body.bone.length;
 	            kelps.push({
 	                pos: p,
-	                radius: r * 30 * (id % 4 == 0 ? 0.5 : 1),
+	                radius: r * 40 * (id % 4 == 0 ? 0.8 : 1),
 	                ratio: 1
 	            });
 	        });
@@ -258,35 +258,119 @@
 	var MyBody = /** @class */ (function (_super) {
 	    __extends(MyBody, _super);
 	    function MyBody() {
-	        var _this = _super.call(this, 18, 30) || this;
+	        var _this = _super.call(this, 18, 38) || this;
 	        _this.legs = [];
+	        _this.moved = 0;
+	        _this.cr = 0;
 	        var offset = 0;
 	        var d = 15;
-	        _this.legs.push(new Legs.NormalLeg(_this, 120, offset, offset + 8, "front", Legs.Leg.Position.LEFT, 10, 50, 0 + d * 2, 60, 50));
-	        _this.legs.push(new Legs.NormalLeg(_this, 120, offset, offset + 8, "front", Legs.Leg.Position.RIGHT, 10, 50, 60 + d * 2, 60, 50));
-	        _this.legs.push(new Legs.NormalLeg(_this, 120, offset + 12, offset + 12, "back", Legs.Leg.Position.LEFT, 20, 70, 60 + d * 1, 70, 80));
-	        _this.legs.push(new Legs.NormalLeg(_this, 120, offset + 12, offset + 12, "back", Legs.Leg.Position.RIGHT, 20, 70, 0 + d * 1, 70, 80));
-	        _this.legs.push(new Legs.NormalLeg(_this, 120, offset + 17, offset + 17, "back", Legs.Leg.Position.LEFT, 10, 60, 0, 80, 90));
-	        _this.legs.push(new Legs.NormalLeg(_this, 120, offset + 17, offset + 17, "back", Legs.Leg.Position.RIGHT, 10, 60, 60, 80, 90));
+	        var stepDistance = 140;
+	        _this.legs.push(new Legs.NormalLeg(_this, stepDistance, offset, offset + 10, "front", Legs.Leg.Position.LEFT, 10, 60, 0 + d * 2, 80, 80));
+	        _this.legs.push(new Legs.NormalLeg(_this, stepDistance, offset, offset + 10, "front", Legs.Leg.Position.RIGHT, 10, 60, stepDistance / 2 + d * 2, 80, 80));
+	        _this.legs.push(new Legs.NormalLeg(_this, stepDistance, offset + 19, offset + 19, "back", Legs.Leg.Position.LEFT, 10, 60, 0, 100, 110));
+	        _this.legs.push(new Legs.NormalLeg(_this, stepDistance, offset + 19, offset + 19, "back", Legs.Leg.Position.RIGHT, 10, 60, stepDistance / 2, 100, 110));
 	        return _this;
 	    }
 	    MyBody.prototype.setOffset = function (o) {
-	        this.legs[0].stepOffset = 0 + o * 2;
-	        this.legs[1].stepOffset = 60 + o * 2;
-	        this.legs[2].stepOffset = 60 + o * 1;
-	        this.legs[3].stepOffset = 0 + o * 1;
-	        this.legs[4].stepOffset = 0;
-	        this.legs[5].stepOffset = 60;
 	    };
 	    MyBody.prototype.move = function (moved) {
-	        var l2l = [50, 50, 80, 80, 90, 90];
 	        this.legs.forEach(function (l, id) {
-	            l.l2l = l2l[id] * ((Math.cos(l.moveProgress * Math.PI * 2) + 1) / 2 * 0.2 + 0.8);
 	            l.moveDistance = moved;
 	        });
 	    };
+	    MyBody.prototype.setHead = function (pos) {
+	        var _this = this;
+	        var np = PosStack.fromPos(pos);
+	        if (this.posStack) {
+	            if (np.distance(this.posStack) > 0) {
+	                this.moved += np.distance(this.posStack);
+	                np.next = this.posStack;
+	                this.posStack = np;
+	            }
+	        }
+	        else {
+	            this.posStack = np;
+	        }
+	        this.bone = [];
+	        var pp = this.posStack;
+	        var tp = this.posStack;
+	        var body = [];
+	        var _loop_1 = function (i) {
+	            var ad = 0;
+	            var nd = this_1.boneLength;
+	            pp.forEach(function (p, id) {
+	                if (id == 0)
+	                    return true;
+	                var dx = p.x - tp.x;
+	                var dy = p.y - tp.y;
+	                var d = Math.sqrt(dx * dx + dy * dy);
+	                ad += d;
+	                if (ad > _this.boneLength) {
+	                    tp = new PosStack(tp.x + dx / d * nd, tp.y + dy / d * nd);
+	                    _this.bone.push(tp.clone());
+	                    body.push(tp.clone());
+	                    nd = _this.boneLength;
+	                    return false;
+	                }
+	                else {
+	                    pp = tp = p;
+	                    nd = _this.boneLength - ad;
+	                }
+	                return true;
+	            });
+	        };
+	        var this_1 = this;
+	        for (var i = 0; i < this.jointCount; i++) {
+	            _loop_1(i);
+	        }
+	        if (pp.next && pp.next.next) {
+	            pp.next.next = null;
+	        }
+	        this.bone.forEach(function (p, id) {
+	            if (id > 0) {
+	                var pp_1 = _this.bone[id - 1];
+	                var np_1 = p;
+	                if (np_1 && pp_1) {
+	                    var dx = pp_1.x - np_1.x;
+	                    var dy = pp_1.y - np_1.y;
+	                    var d = pp_1.distance(np_1);
+	                    var r = Math.sin(id * 0.2 + -_this.cr) * 30;
+	                    var vy = dx / d * r;
+	                    var vx = -dy / d * r;
+	                    pp_1.x += vx * (id / _this.jointCount);
+	                    pp_1.y += vy * (id / _this.jointCount);
+	                }
+	            }
+	            return true;
+	        });
+	        this.cr += 0.1;
+	        this.move(this.moved);
+	    };
 	    return MyBody;
 	}(Legs.Body));
+	var PosStack = /** @class */ (function (_super) {
+	    __extends(PosStack, _super);
+	    function PosStack() {
+	        return _super !== null && _super.apply(this, arguments) || this;
+	    }
+	    PosStack.prototype.forEach = function (callback) {
+	        var p = this;
+	        var id = 0;
+	        while (p) {
+	            if (!callback(p, id))
+	                break;
+	            p = p.next;
+	            id++;
+	        }
+	    };
+	    PosStack.fromPos = function (pos) {
+	        var ps = new PosStack(pos.x, pos.y);
+	        ps.bx = ps.x;
+	        ps.by = ps.y;
+	        return ps;
+	    };
+	    return PosStack;
+	}(pos_1.XY));
 
 
 /***/ }),
@@ -378,13 +462,6 @@
 	        enumerable: true,
 	        configurable: true
 	    });
-	    Object.defineProperty(Body.prototype, "bone", {
-	        get: function () {
-	            return this._bone;
-	        },
-	        enumerable: true,
-	        configurable: true
-	    });
 	    Body.prototype.setHead = function (pos) {
 	        var _this = this;
 	        var np = posStack_1.default.fromPos(pos);
@@ -398,7 +475,7 @@
 	        else {
 	            this._posStack = np;
 	        }
-	        this._bone = [];
+	        this.bone = [];
 	        var pp = this._posStack;
 	        var tp = this._posStack;
 	        var body = [];
@@ -414,7 +491,7 @@
 	                ad += d;
 	                if (ad > _this._boneLength) {
 	                    tp = new posStack_1.default(tp.x + dx / d * nd, tp.y + dy / d * nd);
-	                    _this._bone.push(tp.clone());
+	                    _this.bone.push(tp.clone());
 	                    body.push(tp.clone());
 	                    nd = _this._boneLength;
 	                    return false;
